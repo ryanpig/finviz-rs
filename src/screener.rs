@@ -2,36 +2,87 @@
 use crate::screener_type::ScreenerType;
 use crate::signal_type::SignalType;
 use crate::order_type::OrderType;
-use crate::common::{UrlString};
+use crate::web_scraper::scrape_common;
+use crate::common::TableData;
 
-const BASE_URL: &'static str = "https://finviz.com/screener.ashx?";
+const BASE_URL: &str = "https://finviz.com/screener.ashx?";
+
+/// This struct represents a screener configuration for data retrieval.
+///
+/// It has fields as following: 
+/// - base_type is of type ScreenerType and represents the base type of the screener.
+/// - signal_type is an optional field of type SignalType that represents the signal type for filtering.
+/// - order_type is an optional field of type OrderType that represents the order type for sorting.
+///
+/// # Example
+///
+/// ```
+/// use crate::finviz_rs::{
+///     screener::Screener,
+///     screener_type::ScreenerType,
+///     signal_type::SignalType,
+///     order_type::OrderType,
+///     output::ToTable,
+/// };
+///
+/// fn main() -> Result<(),Box<dyn std::error::Error>> {
+/// let table_str = Screener::new(ScreenerType::Overview)
+///     .set_signal(SignalType::DoubleBottom)
+///     .set_order(OrderType::Ticker)
+///     .scrape_screener()?
+///     .to_table(None, Some(3));
+/// println!("{}", table_str);
+/// Ok(())
+/// }
+/// ```
+///
+/// The above example demonstrates how to retrive the Overview of screener page into a table and print it.
 pub struct Screener {
     base_type: ScreenerType,
     signal_type: Option<SignalType>,
     order_type: Option<OrderType>
 }
 
+impl Default for Screener {
+    fn default() -> Self {
+        Self::new(ScreenerType::Overview)
+    }
+}
+
 impl Screener {
+
+    /// Creates a new `Screener` instance with the specified `ScreenerType`.
     pub fn new(base_type: ScreenerType) ->  Self {
         Self {base_type, signal_type: None, order_type: None}
     }
 
-    pub fn set_signal(self: &mut Self, signal_type: SignalType) {
+    /// Sets the signal type for the screener.
+    pub fn set_signal(&mut self, signal_type: SignalType) -> &mut Self {
         self.signal_type = Some(signal_type);
+        self
     }
 
-    pub fn set_order(self: &mut Self, order_type: OrderType) {
+    /// Sets the order type for the screener.
+    pub fn set_order(&mut self, order_type: OrderType) -> &mut Self {
         self.order_type = Some(order_type);
+        self
     }
 
-    pub fn to_url(self: &Self) ->  String {
+    /// Generates the URL based on the current screener configuration.
+    pub fn to_url(&self) ->  String {
         format!("{}v={}{}{}", BASE_URL, 
-                            self.base_type.to_url_string(), 
-                            self.signal_type.as_ref().map_or(String::new(), |s| format!("&s={}", s.to_url_string())),
-                            self.order_type.as_ref().map_or(String::new(), |s| format!("&{}", s.to_url_string()))
+                            self.base_type, 
+                            self.signal_type.as_ref().map_or(String::new(), |s| format!("&s={}", s)),
+                            self.order_type.as_ref().map_or(String::new(), |s| format!("&{}", s))
                )
 
     }
+
+    /// The scrape_screener function scrapes the data from the generated URL using the scrape_common function and returns a TableData result.
+    pub fn scrape_screener(&self) -> Result<TableData, Box<dyn std::error::Error>> {
+        scrape_common(&self.to_url(), false)
+    }
+
 }
 
 #[cfg(test)]

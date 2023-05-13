@@ -1,4 +1,7 @@
+use std::fmt;
 
+/// Represents the possible order type that can be passed as parameter in `Screener`.
+#[doc(hidden)]
 #[allow(dead_code)]
 pub enum OrderType {
     Ticker,
@@ -73,9 +76,11 @@ pub enum OrderType {
     IPODate,
 }
 
-impl OrderType {
-    pub fn to_url_string(&self) -> &str {
-        match self {
+impl fmt::Display for OrderType {
+
+    /// Formats the `OrderType` that can be used as URL parameter in `Screener` 
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let value = match self {
             OrderType::Ticker => "o=ticker",
             OrderType::Company => "o=company",
             OrderType::Sector => "o=sector",
@@ -146,7 +151,8 @@ impl OrderType {
             OrderType::Price => "o=price",
             OrderType::TargetPrice => "o=targetprice",
             OrderType::IPODate => "o=ipodate",
-        }
+        };
+        write!(f, "{}", value)
     }
 }
 
@@ -158,7 +164,7 @@ mod tests {
     #[test]
     fn test_url_string_of_signal_type() {
         let t = OrderType::PerformanceWeek;
-        assert_eq!(t.to_url_string(), "o=perf1w");
+        assert_eq!(t.to_string(), "o=perf1w");
     }
 
 }

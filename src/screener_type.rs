@@ -1,6 +1,7 @@
+use std::fmt;
 
-use crate::common::UrlString;
-
+/// Represents the possible screener type that can be passed as parameter in `Screener`.
+#[doc(hidden)]
 #[allow(dead_code)]
 pub enum ScreenerType {
     Financial,
@@ -13,9 +14,11 @@ pub enum ScreenerType {
 }
 
 
-impl UrlString for ScreenerType {
-    fn to_url_string(&self) -> &str {
-        match self {
+impl fmt::Display for ScreenerType {
+
+    /// Formats the `ScreenerType` that can be used as URL parameter in `Screener` 
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let value = match self {
             ScreenerType::Overview => "111",
             ScreenerType::Valuation => "121",
             ScreenerType::Ownership => "131",
@@ -23,12 +26,10 @@ impl UrlString for ScreenerType {
             ScreenerType::Custom => "152",
             ScreenerType::Financial => "161",
             ScreenerType::Technical => "171",
-        }
-
+        };
+        write!(f, "{}", value)
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -37,6 +38,6 @@ mod tests {
     #[test]
     fn test_url_string_of_screener_type() {
         let t = ScreenerType::Technical;
-        assert_eq!(t.to_url_string(), "171");
+        assert_eq!(t.to_string(), "171");
     }
 }

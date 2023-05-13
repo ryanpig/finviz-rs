@@ -2,7 +2,19 @@ use scraper::{Html, Selector};
 
 use reqwest::blocking::Client;
 use reqwest::header::USER_AGENT;
+use crate::common::TableData;
 
+/// Sends an HTTP GET request to the specified URL using the provided client.
+///
+/// # Arguments
+///
+/// * `client` - A reference to the `reqwest` client.
+/// * `url` - The URL to which the request is sent.
+///
+/// # Returns
+///
+/// Returns a `Result` containing the `reqwest::blocking::Response` if the request is successful, or a `reqwest::Error` if an error occurs.
+///
 fn send_request(client: &Client, url: &str) -> Result<reqwest::blocking::Response, reqwest::Error> {
     client
         .get(url)
@@ -10,35 +22,90 @@ fn send_request(client: &Client, url: &str) -> Result<reqwest::blocking::Respons
         .send()
 }
 
-/*
-The web_scrape() takes a URL as input and returns a vector of vectors of strings, representing the scraped table. Each inner vector represents a row, and each string represents a cell value.
-*/
-pub fn text_scrape(url: &str) -> Vec<Vec<String>> {
-    let client = Client::new();
-    let resp = send_request(&client, url).expect("Failed to send request");
 
+/// Scrapes table data from a web page using the provided URL and skip_header flag.
+///
+/// # Arguments
+///
+/// * `url` - The URL of the web page to scrape.
+/// * `skip_header` - A boolean flag indicating whether to skip the table header row.
+///
+/// # Returns
+///
+/// Returns a `Result` containing the scraped table data as `TableData` if successful, or a `Box<dyn std::error::Error>` if an error occurs.
+///
+pub fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Box<dyn std::error::Error>> {
 
-    let body = resp.text().expect("Failed to retrieve response body");
+    let body = get_html_body(url)?;
     let document = Html::parse_document(&body);
-    let table_selector = Selector::parse("table.table-light").expect("Failed to parse table selector");
-    let row_selector = Selector::parse("tr").expect("Failed to parse row selector");
-    let cell_selector = Selector::parse("td").expect("Failed to parse cell selector");
 
-    let table = document.select(&table_selector).next().expect("Table not found");
-    let rows = table.select(&row_selector);
-    let mut frame = Vec::new();
+    let table_selector = Selector::parse("table.table-light")?;
+    let row_selector = Selector::parse("tr")?;
+    let cell_selector = Selector::parse("td")?;
 
-    for row in rows {
-        let cells = row.select(&cell_selector).skip(1); // Skip the first cell
-        let mut info_dict = Vec::new();
+    let frame: Result<Vec<Vec<String>>, &str> = document
+        .select(&table_selector).next()
+        .ok_or("Failed to select the table")
+        .map(|table| {
+            let n = if skip_header {1} else {0};
+            let rows = table.select(&row_selector).skip(n);
+            let mut frame = Vec::new();
 
-        for cell in cells {
-            info_dict.push(cell.text().collect());
-        }
+            for row in rows {
+                let cells = row.select(&cell_selector).skip(1); // Skip the first cell
+                let mut info_dict = Vec::new();
 
-        frame.push(info_dict);
-    }
+                for cell in cells {
+                    info_dict.push(cell.text().collect());
+                }
 
-    frame
+                frame.push(info_dict);
+            }
+
+            frame
+        });
+    Ok(frame?)
 }
 
+/// Retrieves the HTML body of a web page specified by the URL.
+///
+/// # Arguments
+///
+/// * `url` - The URL of the web page.
+///
+/// # Returns
+///
+/// Returns a `Result` containing the HTML body as a string if successful, or a `Box<dyn std::error::Error>` if an error occurs.
+///
+pub fn get_html_body(url: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let client = Client::new();
+    let resp = send_request(&client, url)?;
+    
+    Ok(resp.text()?)
+}
+
+/// Scrapes the chart image for a given ticker from the specified chart URL and saves it to the output directory.
+///
+/// # Arguments
+///
+/// * `chart_url` - The URL of the chart image.
+/// * `ticker` - The ticker symbol associated with the chart.
+/// * `out_dir` - The output directory where the chart image will be saved.
+///
+/// # Returns
+///
+/// Returns a `Result` containing the file path of the saved chart image if successful, or an error message as a string if an error occurs.
+///
+pub fn scrape_chart_image(chart_url: &str, ticker: &str, out_dir: &str) -> Result<String, String> {
+    println!("Getting image for ticker {} from URL: {} (out dir={})", ticker, chart_url, out_dir);
+    let file_path = format!("{}/{}.png", out_dir, ticker);
+    let mut file = std::fs::File::create(&file_path).unwrap();
+
+    let client = Client::new();
+    let write_size = send_request(&client, chart_url).map_err(|err| err.to_string())?
+                                       .copy_to(&mut file).map_err(|err| err.to_string())?;
+    if write_size > 0 {
+        println!("Write {} bytes to {}", write_size, &file_path);
+    }
+    Ok(file_path)
+}

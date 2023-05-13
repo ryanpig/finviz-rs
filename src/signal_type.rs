@@ -1,5 +1,8 @@
-use crate::common::{UrlString, DisplayString};
+use crate::common::DisplayString;
+use std::fmt;
 
+/// Represents the signal type that can be passed as parameter in `Screener`.
+#[doc(hidden)]
 #[allow(dead_code)]
 pub enum SignalType {
     TopGainers,
@@ -37,9 +40,11 @@ pub enum SignalType {
     HeadShouldersInverse,
 }
 
-impl UrlString for SignalType {
-    fn to_url_string(&self) -> &str {
-        match self {
+impl fmt::Display for SignalType {
+
+    /// Formats the `SignalType` that can be used as URL parameter in `Screener` 
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let value = match self {
             SignalType::TopGainers => "ta_topgainers",
             SignalType::TopLosers => "ta_toplosers",
             SignalType::NewHigh => "ta_newhigh",
@@ -73,12 +78,15 @@ impl UrlString for SignalType {
             SignalType::MultipleBottom => "ta_p_multiplebottom",
             SignalType::HeadShoulders => "ta_p_headandshoulders",
             SignalType::HeadShouldersInverse => "ta_p_headandshouldersinv",
-        }
+        };
+        write!(f, "{}", value)
     }
 }
 
 
 impl DisplayString for SignalType {
+
+    /// Formats the `SignalType` to reutrn a description 
     fn to_display_string(&self) -> &str {
         match self {
             SignalType::TopGainers => "Top Gainers",
@@ -126,7 +134,7 @@ mod tests {
     #[test]
     fn test_url_string_of_signal_type() {
         let t = SignalType::TopGainers;
-        assert_eq!(t.to_url_string(), "ta_topgainers");
+        assert_eq!(t.to_string(), "ta_topgainers");
     }
 
     #[test]
