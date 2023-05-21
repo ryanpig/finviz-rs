@@ -20,6 +20,7 @@ The Rust library `finviz-rs` is a crate for fetching financial data and stock ch
     - [Group](#group)
 3. [Output types](#output)
     - [CSV](#csv)
+    - [json](#json)
 4. [Others](#others)
     - [Retrieve multiple tables](#retrieve_multiple_data)
 
@@ -39,7 +40,7 @@ The library offers access to various types of financial data, including:
 #### Crate features
 - Retrieve multiple tables: retrieve all possible combinations of enum variants by iterator 
 - Output to a table: easily format and display the fetched data in a table format for convenient viewing and analysis.
-- Output to a CSV file: export the data to a CSV file, allowing for seamless integration with other tools and workflows.
+- Output to `csv` file or `json` format: export the data to `csv` & `json`, allowing for seamless integration with other tools and workflows.
 - Save stock chart image: capture and save stock chart images to local file system  
 
 
@@ -276,10 +277,30 @@ cargo run --example future
 
 ### Output <a name="output"></a>
 #### Output to a CSV file <a name="csv"></a>
+```bash
+cargo run --example output_csv 
+```
+
 ```rust
     Screener::new(ScreenerType::Performance)
         .scrape()?
         .to_csv_file("output.csv")?;
+```
+
+#### Output to json <a name="json"></a>
+```bash
+cargo run --example output_json
+```
+
+```rust
+    let json_data = Forex::default()
+        .scrape()?
+        .into_iter()
+        .take(2)
+        .collect::<TableData>()
+        .to_json(Some(Forex::default_header()))?;
+    println!("{}", serde_json::to_string_pretty(&json_data)?);
+
 ```
 
 
@@ -288,7 +309,7 @@ cargo run --example future
 Powered by the crate [strum](https://crates.io/crates/strum), we're able to iterate all enum types as following example:
 
 ```bash
-cargo run iter_all_enum_variants
+cargo run --example iter_all_enum_variants
     
 ```
 

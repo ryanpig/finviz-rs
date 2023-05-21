@@ -3,6 +3,7 @@ use crate::common::{DictData, TableData};
 use csv::Writer;
 use std::error::Error;
 use std::fs::File;
+use serde_json::{Value, json};
 
 /// A trait for converting data into a formatted table.
 pub trait ToTable {
@@ -92,7 +93,8 @@ pub fn from_dict_to_table(dict: &DictData, max_pairs_per_row: usize) -> TableDat
 #[cfg(feature = "output_csv")]
 pub trait ToCsvFile {
 
-    /// This function is only available when the "output_csv" feature is enabled.
+    /// This function is only available when the "output_csv" feature is enabled. (enabled by
+    /// default)
     ///
     /// # Arguments
     ///
@@ -144,6 +146,34 @@ impl ToCsvFile for TableData {
         Ok(())
     }
 }
+
+/// Convert data to a json data
+pub trait ToJson {
+
+    /// convert data to json Value
+    fn to_json(&self, header: Option<Vec<String>>) -> Result<Value, Box<dyn Error>>;
+}
+
+impl ToJson for TableData {
+
+    fn to_json(&self, header: Option<Vec<String>>) -> Result<Value, Box<dyn Error>> {
+        let mut data: Vec<Value> = Vec::new();
+
+        if header.is_some() {
+            data.push(json!(header));
+        }
+
+        for row in self.iter() {
+            data.push(json!(row));
+        }
+
+        Ok(json!({
+            "data": data 
+            })
+        )
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -214,5 +244,16 @@ mod tests {
         let data = Vec::from([headers, row1, row2]);
         assert!(data.to_csv_file("test.csv").is_ok());
         assert!(Path::new("./test.csv").is_file());
+    }
+
+    #[test]
+    fn test_to_json() {
+        let headers = ["ETF Name", "Price", "Chg", "Chg(%)", "Vol"].map(String::from).to_vec();
+        let row1 = ["VOO", "10.0", "3.3", "5.5", "3000"].map(String::from).to_vec();
+        let row2 = ["VOO2", "10.0", "3.3", "5.5", "3000"].map(String::from).to_vec();
+        let row3 = ["VOO3", "10.0", "3.3", "5.5", "3000"].map(String::from).to_vec();
+        let json_data = Vec::from([row1, row2, row3]).to_json(Some(headers));
+        assert!(&json_data.is_ok());
+
     }
 }

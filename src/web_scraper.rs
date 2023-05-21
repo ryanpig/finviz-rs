@@ -56,7 +56,8 @@ pub fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Box<dyn 
                 let mut info_dict = Vec::new();
 
                 for cell in cells {
-                    info_dict.push(cell.text().collect());
+                    let text = cell.text().collect::<String>().trim().to_owned();
+                    info_dict.push(text);
                 }
 
                 frame.push(info_dict);
