@@ -9,7 +9,7 @@ description = "Fetch finviz financial data"
 documentaion = "https://docs.rs/finviz_rs/0.2.0/finviz_rs/"
 homepage = "https://github.com/ryanpig/finviz-rs"
 repository = "https://github.com/ryanpig/finviz-rs"
-keywords = ["finance", "finviz", "screener", "stock-data", "scraper", "csv", "finviz-api"]
+keywords = ["finance", "finviz", "screener", "stock-data", "csv"]
 
 [dependencies]
 reqwest = { version = "^0.11",  features = ["blocking", "json"] }
