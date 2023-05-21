@@ -154,7 +154,7 @@ cargo run --example screener
 ```bash
 cargo run --example screener
 ```
-```
+```rust
     let table_str = Insider::default()
         .scrape()?
         .to_table(Some(Insider::default_header()), Some(3));
