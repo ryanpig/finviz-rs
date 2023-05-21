@@ -2,7 +2,7 @@ use std::fmt;
 use std::collections::BTreeMap;
 use crate::web_scraper::{scrape_chart_image, get_html_body};
 use scraper::{Html, Selector};
-use crate::common::DictData;
+use crate::common::{DictData, Scrape};
 use std::fs;
 
 
@@ -16,6 +16,7 @@ use std::fs;
 /// use crate::finviz_rs::tickers::{Tickers, TimeFrameType, ChartType};
 /// use crate::finviz_rs::output::ToTable;
 /// use crate::finviz_rs::output::from_dict_to_table;
+/// use crate::finviz_rs::common::Scrape;
 ///
 /// fn main() -> Result<(),Box<dyn std::error::Error>> {
 /// // save a ticker's chart image to a file
@@ -23,7 +24,7 @@ use std::fs;
 /// tickers.ticker_charts(TimeFrameType::Daily, ChartType::ADVANCED, ".")?;
 ///
 /// // output json to table
-/// let fundament_info = Tickers::new("AAPL").ticker_fundament()?;
+/// let fundament_info = Tickers::new("AAPL").scrape()?;
 /// println!("{}", from_dict_to_table(&fundament_info, 4).to_table(None, None));
 /// Ok(())
 /// }
@@ -112,6 +113,9 @@ impl Tickers {
 
         scrape_chart_image(&chart_url, &self.ticker, out_dir)
     }
+}
+
+impl Scrape<DictData> for Tickers {
 
     /// Retrieves fundamental information for a specific ticker.
     ///
@@ -129,9 +133,7 @@ impl Tickers {
     ///
     /// This function can return an error of type `Box<dyn std::error::Error>` if there is an issue retrieving or parsing the HTML data.
     ///
-    pub fn ticker_fundament(
-        &mut self,
-    ) -> Result<DictData, Box<dyn std::error::Error>> {
+    fn scrape(&self) -> Result<DictData, Box<dyn std::error::Error>> {
 
         let body = get_html_body(&format!("https://finviz.com/quote.ashx?t={}", self.ticker))?;
         let document = Html::parse_document(&body);
@@ -157,7 +159,6 @@ impl Tickers {
         Ok(fundament_info)
 
     }
-
 
 }
 

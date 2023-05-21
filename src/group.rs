@@ -1,5 +1,5 @@
 use crate::web_scraper::scrape_common;
-use crate::common::TableData;
+use crate::common::{TableData, Scrape};
 use std::fmt;
 
 #[doc(hidden)]
@@ -168,12 +168,13 @@ impl fmt::Display for Ordering {
 /// ```
 /// use finviz_rs::{
 ///     group::*,
-///     output::ToTable
+///     output::ToTable,
+///     common::Scrape,
 /// };
 /// 
 /// fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let table_str = Group::new(GroupBy::Industry, GroupType::Valuation, OrderBy::PerformanceWeek, Ordering::Ascending)
-///         .scrape_group(false)?
+///         .scrape()?
 ///         .to_table(None, Some(5));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -207,12 +208,16 @@ impl Group {
         let order_by_url = format!("&o={}{}", self.ordering, self.order_by);
         format!("{}?{}{}{}", Group::BASE_URL, self.group_by, self.group_type, order_by_url)
     }
+}
 
-    /// The `scrape_group` function scrapes the group data from the specified URL and returns a `TableData` result
-    pub fn scrape_group(&self, skip_header: bool) -> Result<TableData, Box<dyn std::error::Error>> {
+impl Scrape<TableData> for Group {
+
+    /// The `scrape` function scrapes the group data from the specified URL and returns a `TableData` result
+    fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
         let url = self.get_url() ;
-        scrape_common(&url, skip_header)
+        scrape_common(&url, false)
     }
+
 }
 
 #[cfg(test)]

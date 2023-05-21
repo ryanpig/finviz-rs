@@ -1,10 +1,13 @@
-use finviz_rs::output::ToCsvFile;
-use finviz_rs::screener::Screener;
-use finviz_rs::screener_type::ScreenerType;
+use finviz_rs::{
+    output::ToCsvFile,
+    screener::Screener,
+    screener_type::ScreenerType,
+    common::Scrape
+};
 
 fn main() -> Result<(),Box<dyn std::error::Error>> {
     Screener::new(ScreenerType::Performance)
-        .scrape_screener()?
+        .scrape()?
         .to_csv_file("output.csv")?;
     Ok(())
 }

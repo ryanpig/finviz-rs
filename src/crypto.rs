@@ -1,5 +1,5 @@
 use crate::web_scraper::scrape_common;
-use crate::common::TableData;
+use crate::common::{TableData, Scrape};
 
 /// Represents a Crypto struct.
 ///
@@ -10,9 +10,10 @@ use crate::common::TableData;
 /// ```
 /// use crate::finviz_rs::crypto::Crypto;
 /// use crate::finviz_rs::output::ToTable;
+/// use crate::finviz_rs::common::Scrape;
 ///
 /// let crypto = Crypto::new();
-/// let table = crypto.scrape_crypto_performance();
+/// let table = crypto.scrape();
 ///
 /// if let Ok(table_data) = table {
 ///     println!("{}", table_data.to_table(None, None));
@@ -38,16 +39,6 @@ impl Crypto {
         Self{}
     }
 
-    /// Scrapes crypto performance data from the specified URL.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the scraped data as TableData on success, or a `Box<dyn std::error::Error>`
-    /// on failure.
-    pub fn scrape_crypto_performance(&self) -> Result<TableData, Box<dyn std::error::Error>> {
-        scrape_common(Crypto::BASE_URL, true)
-    }
-
     /// Returns the default header for crypto performance table.
     ///
     /// # Returns
@@ -59,3 +50,15 @@ impl Crypto {
     }
 }
 
+impl Scrape<TableData> for Crypto {
+
+    /// Scrapes crypto performance data from the specified URL.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the scraped data as TableData on success, or a `Box<dyn std::error::Error>`
+    /// on failure.
+    fn scrape(&self,) -> Result<TableData, Box<dyn std::error::Error>> {
+        scrape_common(Crypto::BASE_URL, true)
+    }
+}

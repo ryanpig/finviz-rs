@@ -1,6 +1,6 @@
 use scraper::{Html, Selector};
 use crate::web_scraper::get_html_body;
-use crate::common::TableData;
+use crate::common::{TableData, Scrape};
 
 #[doc(hidden)]
 pub enum InsiderType {
@@ -23,12 +23,13 @@ pub enum InsiderType {
 /// ```
 /// use finviz_rs::{
 ///     insider::Insider,
-///     output::ToTable
+///     output::ToTable,
+///     common::Scrape,
 /// };
 /// 
 /// fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let table_str = Insider::default()
-///         .scrape_insider()?
+///         .scrape()?
 ///         .to_table(Some(Insider::default_header()), Some(3));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -78,8 +79,13 @@ impl Insider {
             .map(String::from).to_vec()
     }
 
+
+}
+
+impl Scrape<TableData> for Insider {
+
     /// Scrapes the insider trading data from the specified URL and return `TableData` on success
-    pub fn scrape_insider(&self) -> Result<TableData, Box<dyn std::error::Error>> {
+    fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
         let url = self.get_url();
         let body = get_html_body(&url)?;
         let document = Html::parse_document(&body);
@@ -132,7 +138,7 @@ mod tests {
     #[test]
     fn test_insider() {
         let insider = Insider::default();
-        let result = insider.scrape_insider();
+        let result = insider.scrape();
         assert!(result.is_ok(), "failed to get insider info");
     }
 

@@ -1,5 +1,5 @@
 use crate::web_scraper::get_html_body;
-use crate::common::TableData;
+use crate::common::{TableData, Scrape};
 use serde_json::Value;
 use std::fmt;
 
@@ -43,12 +43,13 @@ pub enum TimeFrame {
 /// ```
 /// use finviz_rs::{
 ///     future::Future,
-///     output::ToTable
+///     output::ToTable,
+///     common::Scrape,
 /// };
 /// 
 /// fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let table_str = Future::default()
-///         .scrape_future_performance()?
+///         .scrape()?
 ///         .to_table(Some(Future::default_header()), Some(3));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -95,12 +96,26 @@ impl Future {
         }
     }
 
+
+    /// Returns the default header for the futures performance table.
+    ///
+    /// # Returns
+    ///
+    /// A vector of strings representing the default header.
+    pub fn default_header() -> Vec<String>  {
+        ["ticker", "label", "group", "perf"]
+        .map(String::from).to_vec()
+    }
+}
+
+impl Scrape<TableData> for Future {
+
     /// Scrapes futures performance data from the specified URL.
     ///
     /// # Returns
     ///
     /// A Result containing the scraped data as TableData on success, or a FutureError on failure.
-    pub fn scrape_future_performance(&self) -> Result<TableData> {
+    fn scrape(&self) -> Result<TableData> {
         let url = self.get_url();
         let body = get_html_body(&url)?;
         let start_index = body.find("var rows = ").unwrap() + 11;
@@ -135,15 +150,6 @@ impl Future {
         Err(Box::new(FutureError::NoJsonArray))
     }
 
-    /// Returns the default header for the futures performance table.
-    ///
-    /// # Returns
-    ///
-    /// A vector of strings representing the default header.
-    pub fn default_header() -> Vec<String>  {
-        ["ticker", "label", "group", "perf"]
-        .map(String::from).to_vec()
-    }
 }
 
 #[cfg(test)]

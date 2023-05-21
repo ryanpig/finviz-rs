@@ -45,7 +45,7 @@ cargo run --example tickers
 ```
 ```rust
     // output json to table
-    let fundament_info = Tickers::new("AAPL").ticker_fundament()?;
+    let fundament_info = Tickers::new("AAPL").scrape()?;
     println!("{}", from_dict_to_table(&fundament_info, 4).to_table(None, None));
 ```
 
@@ -77,7 +77,7 @@ cargo run --example news
 
 ```rust
     let r = News::default()
-        .scrape_news()?;
+        .scrape()?;
     println!("{}", r.news.to_table(Some(News::default_header()), Some(5)));
 ```
 
@@ -108,7 +108,7 @@ cargo run --example screener
     let table_str = Screener::new(ScreenerType::Performance)
         .set_signal(SignalType::TopLosers)
         .set_order(OrderType::EPS)
-        .scrape_screener()?
+        .scrape()?
         .to_table(None, Some(2));
     println!("{}", table_str);
 
@@ -116,7 +116,7 @@ cargo run --example screener
     let table_str= Screener::new(ScreenerType::Financial)
         .set_signal(SignalType::NewHigh)
         .set_order(OrderType::MarketCap)
-        .scrape_screener()?
+        .scrape()?
         .to_table(None, Some(3));
     println!("{}", table_str);
 
@@ -148,7 +148,7 @@ cargo run --example screener
 ```
 ```
     let table_str = Insider::default()
-        .scrape_insider()?
+        .scrape()?
         .to_table(Some(Insider::default_header()), Some(3));
     println!("{}", table_str);
 ```
@@ -171,7 +171,7 @@ cargo run --example forex
 ```
 ```rust
     let table_str = Forex::default()
-        .scrape_forex_performance()?
+        .scrape()?
         .to_table(Some(Forex::default_header()), Some(3));
     println!("{}", table_str);
 
@@ -195,7 +195,7 @@ cargo run --example crypto
 ```
 ```rust
     let table_str = Crypto::default()
-        .scrape_crypto_performance()?
+        .scrape()?
         .to_table(Some(Crypto::default_header()), Some(3));
     println!("{}", table_str);
 
@@ -220,7 +220,7 @@ cargo run --example future
 ```
 ```rust
     let table_str = Future::default()
-        .scrape_future_performance()?
+        .scrape()?
         .to_table(Some(Future::default_header()), Some(3));
     println!("{}", table_str);
 ```
@@ -243,7 +243,7 @@ cargo run --example future
 ```
 ```rust
     let table_str = Group::new(GroupBy::Industry, GroupType::Valuation, OrderBy::PerformanceWeek, Ordering::Ascending)
-        .scrape_group(false)?
+        .scrape()?
         .to_table(None, Some(5));
     println!("{}", table_str);
 
@@ -267,7 +267,7 @@ cargo run --example future
 #### Output to a CSV file <a name="csv"></a>
 ```rust
     Screener::new(ScreenerType::Performance)
-        .scrape_screener()?
+        .scrape()?
         .to_csv_file("output.csv")?;
 ```
 

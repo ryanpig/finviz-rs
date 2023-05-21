@@ -6,6 +6,7 @@ use finviz_rs::{
     signal_type::SignalType,
     order_type::OrderType,
     output::ToTable,
+    common::Scrape
 };
 
 fn main() -> Result<(),Box<dyn std::error::Error>> {
@@ -13,7 +14,7 @@ fn main() -> Result<(),Box<dyn std::error::Error>> {
     let table_str = Screener::new(ScreenerType::Overview)
         .set_signal(SignalType::DoubleBottom)
         .set_order(OrderType::Ticker)
-        .scrape_screener()?
+        .scrape()?
         .to_table(None, Some(3));
     println!("{}", table_str);
 
@@ -21,7 +22,7 @@ fn main() -> Result<(),Box<dyn std::error::Error>> {
     let table_str = Screener::new(ScreenerType::Performance)
         .set_signal(SignalType::TopLosers)
         .set_order(OrderType::EPS)
-        .scrape_screener()?
+        .scrape()?
         .to_table(None, Some(2));
     println!("{}", table_str);
 
@@ -29,7 +30,7 @@ fn main() -> Result<(),Box<dyn std::error::Error>> {
     let table_str= Screener::new(ScreenerType::Financial)
         .set_signal(SignalType::NewHigh)
         .set_order(OrderType::MarketCap)
-        .scrape_screener()?
+        .scrape()?
         .to_table(None, Some(3));
     println!("{}", table_str);
 
@@ -37,7 +38,7 @@ fn main() -> Result<(),Box<dyn std::error::Error>> {
     let table_str = Screener::new(ScreenerType::Technical)
         .set_signal(SignalType::NewHigh)
         .set_order(OrderType::MarketCap)
-        .scrape_screener()?
+        .scrape()?
         .to_table(None, Some(3));
     println!("{}", table_str);
     Ok(())

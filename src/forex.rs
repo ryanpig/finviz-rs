@@ -1,5 +1,5 @@
 use crate::web_scraper::scrape_common;
-use crate::common::TableData;
+use crate::common::{TableData, Scrape};
 
 /// Represents the type of Forex data.
 pub enum ForexType {
@@ -16,12 +16,13 @@ pub enum ForexType {
 /// ```
 /// use finviz_rs::{
 ///     forex::Forex,
-///     output::ToTable
+///     output::ToTable,
+///     common::Scrape,
 /// };
 /// 
 /// fn main() -> Result<(),Box<dyn std::error::Error>> {
 ///     let table_str = Forex::default()
-///         .scrape_forex_performance()?
+///         .scrape()?
 ///         .to_table(Some(Forex::default_header()), Some(3));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -61,18 +62,6 @@ impl Forex {
         }
     }
 
-    /// Scrapes Forex performance data from the specified URL.
-    ///
-    /// # Returns
-    ///
-    /// A Result containing the scraped data as TableData on success, or a `Box<dyn std::error::Error>`
-    /// on failure.
-    pub fn scrape_forex_performance(
-        &self,
-    ) -> Result<TableData, Box<dyn std::error::Error>> {
-        scrape_common(&self.get_url(), true)
-    }
-
     /// Returns the default header for Forex performance table.
     ///
     /// # Returns
@@ -85,6 +74,19 @@ impl Forex {
         ].map(String::from).to_vec()
     }
 
+}
+
+impl Scrape<TableData> for Forex {
+
+    /// Scrapes Forex performance data from the specified URL.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the scraped data as TableData on success, or a `Box<dyn std::error::Error>`
+    /// on failure.
+    fn scrape(&self,) -> Result<TableData, Box<dyn std::error::Error>> {
+        scrape_common(&self.get_url(), true)
+    }
 }
 
 #[cfg(test)]

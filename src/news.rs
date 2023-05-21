@@ -1,6 +1,6 @@
 use scraper::{Html, Selector};
 use crate::web_scraper::get_html_body;
-use crate::common::TableData;
+use crate::common::{TableData, Scrape};
 
 /// `News` struct provides a way to scrape News page and convert the content into `TableData`
 ///
@@ -9,12 +9,13 @@ use crate::common::TableData;
 /// ```
 /// use crate::finviz_rs::{
 ///     news::News,
-///     output::ToTable
+///     output::ToTable,
+///     common::Scrape,
 /// };
 /// 
 /// fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let r = News::default()
-///         .scrape_news()?;
+///         .scrape()?;
 ///     println!("{}", r.news.to_table(Some(News::default_header()), Some(5)));
 ///     println!("{}", r.blogs.to_table(Some(News::default_header()), Some(5)));
 ///     Ok(())
@@ -49,8 +50,18 @@ impl News {
         Self{}
     }
 
+
+    /// Returns the default header of news or blogs type of `TableData`.
+    pub fn default_header() -> Vec<String> {
+        ["Time", "Title", "Source", "Link"].map(String::from).to_vec()
+    }
+
+}
+
+impl Scrape<NewsData> for News {
+
     /// Scrapes the news data from the specified URL and return `TableData` on success, or `Box<dyn std::error::Error>` on failure
-    pub fn scrape_news(&self) -> Result<NewsData, Box<dyn std::error::Error>> {
+    fn scrape(&self) -> Result<NewsData, Box<dyn std::error::Error>> {
         let body = get_html_body(News::BASE_URL)?;
         let document = Html::parse_document(&body);
 
@@ -69,12 +80,6 @@ impl News {
 
         Ok( NewsData { news, blogs} )
     }
-
-    /// Returns the default header of news or blogs type of `TableData`.
-    pub fn default_header() -> Vec<String> {
-        ["Time", "Title", "Source", "Link"].map(String::from).to_vec()
-    }
-
 }
 
 
@@ -123,7 +128,7 @@ mod tests {
     #[test]
     fn test_get_news() {
         let news = News::default();
-        let result = news.scrape_news();
+        let result = news.scrape();
         if result.is_err() { println!("{:?}", result); }
         assert!(result.is_ok(), "Failed");
         let r = result.unwrap();
