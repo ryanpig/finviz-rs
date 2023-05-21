@@ -4,6 +4,7 @@ use crate::web_scraper::{scrape_chart_image, get_html_body};
 use scraper::{Html, Selector};
 use crate::common::{DictData, Scrape};
 use std::fs;
+use strum::EnumIter;
 
 
 /// Represents a Tickers struct.
@@ -36,6 +37,7 @@ pub struct Tickers {
 }
 
 #[doc(hidden)]
+#[derive(EnumIter)]
 pub enum TimeFrameType {
     Daily, Weekly, Monthly
 }
@@ -54,6 +56,7 @@ impl fmt::Display for TimeFrameType {
 }
 
 #[doc(hidden)]
+#[derive(EnumIter)]
 pub enum ChartType {
     CANDLE, LINE, ADVANCED
 }

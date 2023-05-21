@@ -1,8 +1,10 @@
 use std::fmt;
+use strum::EnumIter;
 
 /// Represents the possible order type that can be passed as parameter in `Screener`.
 #[doc(hidden)]
 #[allow(dead_code)]
+#[derive(EnumIter)]
 pub enum OrderType {
     Ticker,
     Company,

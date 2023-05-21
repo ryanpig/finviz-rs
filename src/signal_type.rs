@@ -1,9 +1,11 @@
 use crate::common::DisplayString;
 use std::fmt;
+use strum::EnumIter;
 
 /// Represents the signal type that can be passed as parameter in `Screener`.
 #[doc(hidden)]
 #[allow(dead_code)]
+#[derive(EnumIter)]
 pub enum SignalType {
     TopGainers,
     TopLosers,

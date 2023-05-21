@@ -1,8 +1,10 @@
 use scraper::{Html, Selector};
 use crate::web_scraper::get_html_body;
 use crate::common::{TableData, Scrape};
+use strum::EnumIter;
 
 #[doc(hidden)]
+#[derive(EnumIter)]
 pub enum InsiderType {
     Latest,
     LatestBuys,

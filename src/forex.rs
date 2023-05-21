@@ -1,7 +1,9 @@
 use crate::web_scraper::scrape_common;
 use crate::common::{TableData, Scrape};
+use strum::EnumIter;
 
 /// Represents the type of Forex data.
+#[derive(EnumIter)]
 pub enum ForexType {
     /// Forex performance represented as a percentage.
     Percent,

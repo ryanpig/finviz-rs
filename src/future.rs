@@ -2,6 +2,7 @@ use crate::web_scraper::get_html_body;
 use crate::common::{TableData, Scrape};
 use serde_json::Value;
 use std::fmt;
+use strum::EnumIter;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -32,6 +33,7 @@ impl std::error::Error for FutureError {
 
 /// Represents the time frame for futures data.
 #[doc(hidden)]
+#[derive(EnumIter)]
 pub enum TimeFrame {
     Daily, Weekly, Monthly, Quarter, HalfYear, Year
 }

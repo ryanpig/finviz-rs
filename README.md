@@ -10,16 +10,18 @@ The Rust library `finviz-rs` is a crate for fetching financial data and stock ch
 1. [Introduction](#introduction)
 2. [Installation](#installation)
 2. [Examples](#example)
-    1. [Fundament](#fundament)
-    2. [News](#news)
-    3. [Screener](#screener)
-    4. [Insider](#insider)
-    5. [Forex](#forex)
-    6. [Crypto](#crypto)
-    7. [Future](#future)
-    8. [Group](#group)
+    - [Fundament](#fundament)
+    - [News](#news)
+    - [Screener](#screener)
+    - [Insider](#insider)
+    - [Forex](#forex)
+    - [Crypto](#crypto)
+    - [Future](#future)
+    - [Group](#group)
 3. [Output types](#output)
-    1. [CSV](#csv)
+    - [CSV](#csv)
+4. [Others](#others]
+    - [Retrieve multiple tables](#retrieve_multiple_data)
 
 ## Introduction <a name="introduction"></a>
 #### Available data
@@ -35,9 +37,10 @@ The library offers access to various types of financial data, including:
 - Group: explore data related to stock groups or sectors.
 
 #### Crate features
+- Retrieve multiple tables: retrieve all possible combinations of enum variants by iterator 
 - Output to a table: easily format and display the fetched data in a table format for convenient viewing and analysis.
 - Output to a CSV file: export the data to a CSV file, allowing for seamless integration with other tools and workflows.
-- Save stock chart image: capture and save stock chart images to local filesystem  
+- Save stock chart image: capture and save stock chart images to local file system  
 
 
 ### Installation <a name="installation"></a>
@@ -279,4 +282,26 @@ cargo run --example future
         .to_csv_file("output.csv")?;
 ```
 
+
+### Others <a name="others"></a>
+#### Retrieve multiple tables <a name="retrieve_multiple_data"></a>
+Powered by the crate [strum](https://crates.io/crates/strum), we're able to iterate all enum types as following example:
+
+```bash
+cargo run iter_all_enum_variants
+    
+```
+
+```rust
+    use strum::IntoEnumIterator;
+
+    // fetch all types of insider trading data by iterating the enum of InsiderType
+    for insider_type in InsiderType::iter() {
+        let table_str = Insider::new(insider_type)
+            .scrape()?
+            .to_table(Some(Insider::default_header()), Some(3));
+        println!("{}", table_str);
+    }
+
+```
 

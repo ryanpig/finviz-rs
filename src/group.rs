@@ -1,8 +1,10 @@
 use crate::web_scraper::scrape_common;
 use crate::common::{TableData, Scrape};
 use std::fmt;
+use strum::EnumIter;
 
 #[doc(hidden)]
+#[derive(EnumIter)]
 pub enum OrderBy {
     Name,
     MarketCapitalization,
@@ -71,6 +73,7 @@ impl fmt::Display for OrderBy {
 
 #[doc(hidden)]
 #[allow(dead_code)]
+#[derive(EnumIter)]
 pub enum GroupType {
     Overview,
     Valuation,
@@ -94,6 +97,7 @@ impl fmt::Display for GroupType {
 
 #[doc(hidden)]
 #[allow(dead_code)]
+#[derive(EnumIter)]
 pub enum GroupBy {
     Sector,
     Industry,
@@ -137,6 +141,7 @@ impl fmt::Display for GroupBy {
 
 #[doc(hidden)]
 #[allow(dead_code)]
+#[derive(EnumIter)]
 pub enum Ordering {
     Ascending, 
     Descending,
