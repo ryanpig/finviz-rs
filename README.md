@@ -8,6 +8,7 @@ The Rust library `finviz-rs` is a crate for fetching financial data and stock ch
 
 # Table of contents
 1. [Introduction](#introduction)
+2. [Installation](#installation)
 2. [Examples](#example)
     1. [Fundament](#fundament)
     2. [News](#news)
@@ -37,6 +38,13 @@ The library offers access to various types of financial data, including:
 - Output to a table: easily format and display the fetched data in a table format for convenient viewing and analysis.
 - Output to a CSV file: export the data to a CSV file, allowing for seamless integration with other tools and workflows.
 - Save stock chart image: capture and save stock chart images to local filesystem  
+
+
+### Installation <a name="installation"></a>
+```bash
+cargo add finviz_rs
+```
+
 
 ### Examples <a name="example"></a>
 #### Fundament <a name="fundament"></a>

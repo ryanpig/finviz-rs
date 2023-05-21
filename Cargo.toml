@@ -1,14 +1,15 @@
 [package]
 name = "finviz_rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["ryanpig <ryanpig@gmail.com>"]
 readme = "README.md"
 license = "MIT"
-description = "fetch finviz financial data"
+description = "Fetch finviz financial data"
+documentaion = "https://docs.rs/finviz_rs/0.2.0/finviz_rs/"
 homepage = "https://github.com/ryanpig/finviz-rs"
 repository = "https://github.com/ryanpig/finviz-rs"
-keywords = ["finance", "finviz"]
+keywords = ["finance", "finviz", "screener", "stock-data", "scraper", "csv", "finviz-api"]
 
 [dependencies]
 reqwest = { version = "^0.11",  features = ["blocking", "json"] }
