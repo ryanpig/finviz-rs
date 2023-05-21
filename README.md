@@ -20,7 +20,7 @@ The Rust library `finviz-rs` is a crate for fetching financial data and stock ch
     - [Group](#group)
 3. [Output types](#output)
     - [CSV](#csv)
-4. [Others](#others]
+4. [Others](#others)
     - [Retrieve multiple tables](#retrieve_multiple_data)
 
 ## Introduction <a name="introduction"></a>
