@@ -9,12 +9,13 @@ use finviz_rs::{
     common::Scrape
 };
 
-fn main() -> Result<(),Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(),Box<dyn std::error::Error>> {
     println!("--- Overview ---");
     let table_str = Screener::new(ScreenerType::Overview)
         .set_signal(SignalType::DoubleBottom)
         .set_order(OrderType::Ticker)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(3));
     println!("{}", table_str);
 
@@ -22,7 +23,7 @@ fn main() -> Result<(),Box<dyn std::error::Error>> {
     let table_str = Screener::new(ScreenerType::Performance)
         .set_signal(SignalType::TopLosers)
         .set_order(OrderType::EPS)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(2));
     println!("{}", table_str);
 
@@ -30,7 +31,7 @@ fn main() -> Result<(),Box<dyn std::error::Error>> {
     let table_str= Screener::new(ScreenerType::Financial)
         .set_signal(SignalType::NewHigh)
         .set_order(OrderType::MarketCap)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(3));
     println!("{}", table_str);
 
@@ -38,7 +39,7 @@ fn main() -> Result<(),Box<dyn std::error::Error>> {
     let table_str = Screener::new(ScreenerType::Technical)
         .set_signal(SignalType::NewHigh)
         .set_order(OrderType::MarketCap)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(3));
     println!("{}", table_str);
     Ok(())

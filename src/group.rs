@@ -2,6 +2,7 @@ use crate::web_scraper::scrape_common;
 use crate::common::{TableData, Scrape};
 use std::fmt;
 use strum::EnumIter;
+use async_trait::async_trait;
 
 #[doc(hidden)]
 #[derive(EnumIter)]
@@ -177,9 +178,10 @@ impl fmt::Display for Ordering {
 ///     common::Scrape,
 /// };
 /// 
-/// fn main() -> Result<(),Box<dyn std::error::Error>>{
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let table_str = Group::new(GroupBy::Industry, GroupType::Valuation, OrderBy::PerformanceWeek, Ordering::Ascending)
-///         .scrape()?
+///         .scrape().await?
 ///         .to_table(None, Some(5));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -215,12 +217,13 @@ impl Group {
     }
 }
 
+#[async_trait]
 impl Scrape<TableData> for Group {
 
     /// The `scrape` function scrapes the group data from the specified URL and returns a `TableData` result
-    fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
+    async fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
         let url = self.get_url() ;
-        scrape_common(&url, false)
+        scrape_common(&url, false).await
     }
 
 }

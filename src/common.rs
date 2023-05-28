@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use async_trait::async_trait;
 
 /// Convert enum types to more readable string 
 pub trait DisplayString {
@@ -14,10 +15,11 @@ pub type TableData = Vec<Vec<String>>;
 pub type DictData = BTreeMap<String, String>;
 
 /// Convert the scraping data into result type T 
+#[async_trait]
 pub trait Scrape<T> {
 
     /// Scrape html content and store the result in type T on success, or `std::error::Error` on failure
-    fn scrape(&self,) -> Result<T, Box<dyn std::error::Error>>;
+    async fn scrape(&self,) -> Result<T, Box<dyn std::error::Error>>;
 }
 
 

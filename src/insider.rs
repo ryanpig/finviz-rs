@@ -2,6 +2,7 @@ use scraper::{Html, Selector};
 use crate::web_scraper::get_html_body;
 use crate::common::{TableData, Scrape};
 use strum::EnumIter;
+use async_trait::async_trait;
 
 #[doc(hidden)]
 #[derive(EnumIter)]
@@ -29,9 +30,10 @@ pub enum InsiderType {
 ///     common::Scrape,
 /// };
 /// 
-/// fn main() -> Result<(),Box<dyn std::error::Error>>{
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let table_str = Insider::default()
-///         .scrape()?
+///         .scrape().await?
 ///         .to_table(Some(Insider::default_header()), Some(3));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -84,12 +86,13 @@ impl Insider {
 
 }
 
+#[async_trait]
 impl Scrape<TableData> for Insider {
 
     /// Scrapes the insider trading data from the specified URL and return `TableData` on success
-    fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
+    async fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
         let url = self.get_url();
-        let body = get_html_body(&url)?;
+        let body = get_html_body(&url).await?;
         let document = Html::parse_document(&body);
 
         let table_selector = Selector::parse("table.body-table")?;
@@ -137,10 +140,10 @@ impl Scrape<TableData> for Insider {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_insider() {
+    #[tokio::test]
+    async fn test_insider() {
         let insider = Insider::default();
-        let result = insider.scrape();
+        let result = insider.scrape().await;
         assert!(result.is_ok(), "failed to get insider info");
     }
 

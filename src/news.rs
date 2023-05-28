@@ -1,6 +1,7 @@
 use scraper::{Html, Selector};
 use crate::web_scraper::get_html_body;
 use crate::common::{TableData, Scrape};
+use async_trait::async_trait;
 
 /// `News` struct provides a way to scrape News page and convert the content into `TableData`
 ///
@@ -13,9 +14,10 @@ use crate::common::{TableData, Scrape};
 ///     common::Scrape,
 /// };
 /// 
-/// fn main() -> Result<(),Box<dyn std::error::Error>>{
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let r = News::default()
-///         .scrape()?;
+///         .scrape().await?;
 ///     println!("{}", r.news.to_table(Some(News::default_header()), Some(5)));
 ///     println!("{}", r.blogs.to_table(Some(News::default_header()), Some(5)));
 ///     Ok(())
@@ -58,11 +60,12 @@ impl News {
 
 }
 
+#[async_trait]
 impl Scrape<NewsData> for News {
 
     /// Scrapes the news data from the specified URL and return `TableData` on success, or `Box<dyn std::error::Error>` on failure
-    fn scrape(&self) -> Result<NewsData, Box<dyn std::error::Error>> {
-        let body = get_html_body(News::BASE_URL)?;
+    async fn scrape(&self) -> Result<NewsData, Box<dyn std::error::Error>> {
+        let body = get_html_body(News::BASE_URL).await?;
         let document = Html::parse_document(&body);
 
         let news_content_selector = Selector::parse("#news table").map_err(|err| err.to_string())?; 
@@ -125,10 +128,10 @@ fn parse_news_table(table: scraper::element_ref::ElementRef<'_>) -> Result<Table
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_get_news() {
+    #[tokio::test]
+    async fn test_get_news() {
         let news = News::default();
-        let result = news.scrape();
+        let result = news.scrape().await;
         if result.is_err() { println!("{:?}", result); }
         assert!(result.is_ok(), "Failed");
         let r = result.unwrap();

@@ -6,9 +6,10 @@ use finviz_rs::{
     common::Scrape
 };
 
-fn main() -> Result<(),Box<dyn std::error::Error>>{
+#[tokio::main]
+async fn main() -> Result<(),Box<dyn std::error::Error>>{
     let table_str = Group::new(GroupBy::Industry, GroupType::Valuation, OrderBy::PerformanceWeek, Ordering::Ascending)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(5));
     println!("{}", table_str);
     Ok(())

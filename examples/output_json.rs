@@ -4,10 +4,11 @@ use finviz_rs::{
     common::{Scrape, TableData},
 };
 
-fn main() -> Result<(),Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(),Box<dyn std::error::Error>> {
 
     let json_data = Forex::default()
-        .scrape()?
+        .scrape().await?
         .into_iter()
         .take(2)
         .collect::<TableData>()
