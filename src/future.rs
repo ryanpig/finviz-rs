@@ -3,6 +3,7 @@ use crate::common::{TableData, Scrape};
 use serde_json::Value;
 use std::fmt;
 use strum::EnumIter;
+use async_trait::async_trait;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -49,9 +50,10 @@ pub enum TimeFrame {
 ///     common::Scrape,
 /// };
 /// 
-/// fn main() -> Result<(),Box<dyn std::error::Error>>{
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>>{
 ///     let table_str = Future::default()
-///         .scrape()?
+///         .scrape().await?
 ///         .to_table(Some(Future::default_header()), Some(3));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -110,6 +112,7 @@ impl Future {
     }
 }
 
+#[async_trait]
 impl Scrape<TableData> for Future {
 
     /// Scrapes futures performance data from the specified URL.
@@ -117,9 +120,9 @@ impl Scrape<TableData> for Future {
     /// # Returns
     ///
     /// A Result containing the scraped data as TableData on success, or a FutureError on failure.
-    fn scrape(&self) -> Result<TableData> {
+    async fn scrape(&self) -> Result<TableData> {
         let url = self.get_url();
-        let body = get_html_body(&url)?;
+        let body = get_html_body(&url).await?;
         let start_index = body.find("var rows = ").unwrap() + 11;
         let end_index = body.find("FinvizInitFuturesPerformance(rows);").unwrap();
         let data_str = body[start_index..end_index].trim().trim_end_matches(';');

@@ -1,9 +1,9 @@
-
 use crate::screener_type::ScreenerType;
 use crate::signal_type::SignalType;
 use crate::order_type::OrderType;
 use crate::web_scraper::scrape_common;
 use crate::common::{TableData, Scrape};
+use async_trait::async_trait;
 
 const BASE_URL: &str = "https://finviz.com/screener.ashx?";
 
@@ -26,11 +26,12 @@ const BASE_URL: &str = "https://finviz.com/screener.ashx?";
 ///     common::Scrape,
 /// };
 ///
-/// fn main() -> Result<(),Box<dyn std::error::Error>> {
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>> {
 /// let table_str = Screener::new(ScreenerType::Overview)
 ///     .set_signal(SignalType::DoubleBottom)
 ///     .set_order(OrderType::Ticker)
-///     .scrape()?
+///     .scrape().await?
 ///     .to_table(None, Some(3));
 /// println!("{}", table_str);
 /// Ok(())
@@ -82,11 +83,12 @@ impl Screener {
 
 }
 
+#[async_trait]
 impl Scrape<TableData> for Screener {
 
     /// The scrape function scrapes the data from the generated URL using the scrape_common function and returns a TableData result.
-    fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
-        scrape_common(&self.to_url(), false)
+    async fn scrape(&self) -> Result<TableData, Box<dyn std::error::Error>> {
+        scrape_common(&self.to_url(), false).await
     }
 }
 

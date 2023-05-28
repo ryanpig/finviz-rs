@@ -1,5 +1,6 @@
 use crate::web_scraper::scrape_common;
 use crate::common::{TableData, Scrape};
+use async_trait::async_trait;
 
 /// Represents a Crypto struct.
 ///
@@ -12,12 +13,17 @@ use crate::common::{TableData, Scrape};
 /// use crate::finviz_rs::output::ToTable;
 /// use crate::finviz_rs::common::Scrape;
 ///
-/// let crypto = Crypto::new();
-/// let table = crypto.scrape();
 ///
-/// if let Ok(table_data) = table {
-///     println!("{}", table_data.to_table(None, None));
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>>{
+///     let table_str = Crypto::new()
+///         .scrape().await?
+///         .to_table(None, Some(3));
+///     println!("{}", table_str);
+///     Ok(())
 /// }
+///
+///
 /// ````
 pub struct Crypto {}
 
@@ -50,6 +56,7 @@ impl Crypto {
     }
 }
 
+#[async_trait]
 impl Scrape<TableData> for Crypto {
 
     /// Scrapes crypto performance data from the specified URL.
@@ -58,7 +65,7 @@ impl Scrape<TableData> for Crypto {
     ///
     /// A Result containing the scraped data as TableData on success, or a `Box<dyn std::error::Error>`
     /// on failure.
-    fn scrape(&self,) -> Result<TableData, Box<dyn std::error::Error>> {
-        scrape_common(Crypto::BASE_URL, true)
+    async fn scrape(&self,) -> Result<TableData, Box<dyn std::error::Error>> {
+        scrape_common(Crypto::BASE_URL, true).await
     }
 }

@@ -6,9 +6,10 @@ use finviz_rs::{
     common::Scrape
 };
 
-fn main() -> Result<(),Box<dyn std::error::Error>>{
+#[tokio::main]
+async fn main() -> Result<(),Box<dyn std::error::Error>>{
     let table_str = Insider::default()
-        .scrape()?
+        .scrape().await?
         .to_table(Some(Insider::default_header()), Some(3));
     println!("{}", table_str);
     Ok(())

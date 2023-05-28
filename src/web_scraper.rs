@@ -1,8 +1,10 @@
 use scraper::{Html, Selector};
 
-use reqwest::blocking::Client;
+use reqwest::Client;
 use reqwest::header::USER_AGENT;
 use crate::common::TableData;
+
+use std::io::prelude::*;
 
 /// Sends an HTTP GET request to the specified URL using the provided client.
 ///
@@ -15,11 +17,11 @@ use crate::common::TableData;
 ///
 /// Returns a `Result` containing the `reqwest::blocking::Response` if the request is successful, or a `reqwest::Error` if an error occurs.
 ///
-fn send_request(client: &Client, url: &str) -> Result<reqwest::blocking::Response, reqwest::Error> {
+async fn send_request(client: &Client, url: &str) -> Result<reqwest::Response, reqwest::Error> {
     client
         .get(url)
         .header(USER_AGENT, "curl/7.82.0")
-        .send()
+        .send().await
 }
 
 
@@ -34,9 +36,9 @@ fn send_request(client: &Client, url: &str) -> Result<reqwest::blocking::Respons
 ///
 /// Returns a `Result` containing the scraped table data as `TableData` if successful, or a `Box<dyn std::error::Error>` if an error occurs.
 ///
-pub fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Box<dyn std::error::Error>> {
+pub async fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Box<dyn std::error::Error>> {
 
-    let body = get_html_body(url)?;
+    let body = get_html_body(url).await?;
     let document = Html::parse_document(&body);
 
     let table_selector = Selector::parse("table.table-light")?;
@@ -78,11 +80,11 @@ pub fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Box<dyn 
 ///
 /// Returns a `Result` containing the HTML body as a string if successful, or a `Box<dyn std::error::Error>` if an error occurs.
 ///
-pub fn get_html_body(url: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn get_html_body(url: &str) -> Result<String, Box<dyn std::error::Error>> {
     let client = Client::new();
-    let resp = send_request(&client, url)?;
+    let resp = send_request(&client, url).await?;
     
-    Ok(resp.text()?)
+    Ok(resp.text().await?)
 }
 
 /// Scrapes the chart image for a given ticker from the specified chart URL and saves it to the output directory.
@@ -97,16 +99,14 @@ pub fn get_html_body(url: &str) -> Result<String, Box<dyn std::error::Error>> {
 ///
 /// Returns a `Result` containing the file path of the saved chart image if successful, or an error message as a string if an error occurs.
 ///
-pub fn scrape_chart_image(chart_url: &str, ticker: &str, out_dir: &str) -> Result<String, String> {
+pub async fn scrape_chart_image(chart_url: &str, ticker: &str, out_dir: &str) -> Result<String, Box<dyn std::error::Error>> {
     println!("Getting image for ticker {} from URL: {} (out dir={})", ticker, chart_url, out_dir);
     let file_path = format!("{}/{}.png", out_dir, ticker);
     let mut file = std::fs::File::create(&file_path).unwrap();
 
     let client = Client::new();
-    let write_size = send_request(&client, chart_url).map_err(|err| err.to_string())?
-                                       .copy_to(&mut file).map_err(|err| err.to_string())?;
-    if write_size > 0 {
-        println!("Write {} bytes to {}", write_size, &file_path);
-    }
+    let resp = send_request(&client, chart_url).await?;
+    let bytes_data = resp.bytes().await?;
+    file.write_all(bytes_data.as_ref())?;
     Ok(file_path)
 }

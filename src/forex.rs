@@ -1,6 +1,7 @@
 use crate::web_scraper::scrape_common;
 use crate::common::{TableData, Scrape};
 use strum::EnumIter;
+use async_trait::async_trait;
 
 /// Represents the type of Forex data.
 #[derive(EnumIter)]
@@ -22,9 +23,10 @@ pub enum ForexType {
 ///     common::Scrape,
 /// };
 /// 
-/// fn main() -> Result<(),Box<dyn std::error::Error>> {
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>> {
 ///     let table_str = Forex::default()
-///         .scrape()?
+///         .scrape().await?
 ///         .to_table(Some(Forex::default_header()), Some(3));
 ///     println!("{}", table_str);
 ///     Ok(())
@@ -78,6 +80,7 @@ impl Forex {
 
 }
 
+#[async_trait]
 impl Scrape<TableData> for Forex {
 
     /// Scrapes Forex performance data from the specified URL.
@@ -86,8 +89,8 @@ impl Scrape<TableData> for Forex {
     ///
     /// A Result containing the scraped data as TableData on success, or a `Box<dyn std::error::Error>`
     /// on failure.
-    fn scrape(&self,) -> Result<TableData, Box<dyn std::error::Error>> {
-        scrape_common(&self.get_url(), true)
+    async fn scrape(&self,) -> Result<TableData, Box<dyn std::error::Error>> {
+        scrape_common(&self.get_url(), true).await
     }
 }
 

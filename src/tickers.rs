@@ -5,6 +5,7 @@ use scraper::{Html, Selector};
 use crate::common::{DictData, Scrape};
 use std::fs;
 use strum::EnumIter;
+use async_trait::async_trait;
 
 
 /// Represents a Tickers struct.
@@ -19,13 +20,14 @@ use strum::EnumIter;
 /// use crate::finviz_rs::output::from_dict_to_table;
 /// use crate::finviz_rs::common::Scrape;
 ///
-/// fn main() -> Result<(),Box<dyn std::error::Error>> {
+/// #[tokio::main]
+/// async fn main() -> Result<(),Box<dyn std::error::Error>> {
 /// // save a ticker's chart image to a file
 /// let tickers = Tickers::new("AAPL");
-/// tickers.ticker_charts(TimeFrameType::Daily, ChartType::ADVANCED, ".")?;
+/// tickers.ticker_charts(TimeFrameType::Daily, ChartType::ADVANCED, ".").await?;
 ///
 /// // output json to table
-/// let fundament_info = Tickers::new("AAPL").scrape()?;
+/// let fundament_info = Tickers::new("AAPL").scrape().await?;
 /// println!("{}", from_dict_to_table(&fundament_info, 4).to_table(None, None));
 /// Ok(())
 /// }
@@ -85,12 +87,12 @@ impl Tickers {
 
     /// Scrapes chart image by the given timeframe and chart type, return the String of the saved image path in
     /// the specified output directory on success, or error string on failure
-    pub fn ticker_charts(
+    pub async fn ticker_charts(
         &self,
         timeframe: TimeFrameType,
         charttype: ChartType,
         out_dir: &str,
-    ) -> Result<String, String> {
+    ) -> Result<String, Box<dyn std::error::Error>> {
 
         let (url_type , url_ta) = match (&charttype, &timeframe) {
             (ChartType::LINE, _) =>  ("l", "0"),
@@ -114,11 +116,13 @@ impl Tickers {
         let out_dir = if out_dir.is_empty() { "." } else { out_dir } ;
         fs::create_dir_all(out_dir).map_err(|err| err.to_string())?;
 
-        scrape_chart_image(&chart_url, &self.ticker, out_dir)
+        scrape_chart_image(&chart_url, &self.ticker, out_dir).await
     }
 }
 
-impl Scrape<DictData> for Tickers {
+#[async_trait]
+impl Scrape<DictData> for Tickers 
+{
 
     /// Retrieves fundamental information for a specific ticker.
     ///
@@ -136,9 +140,9 @@ impl Scrape<DictData> for Tickers {
     ///
     /// This function can return an error of type `Box<dyn std::error::Error>` if there is an issue retrieving or parsing the HTML data.
     ///
-    fn scrape(&self) -> Result<DictData, Box<dyn std::error::Error>> {
+    async fn scrape(&self) -> Result<DictData, Box<dyn std::error::Error>> {
 
-        let body = get_html_body(&format!("https://finviz.com/quote.ashx?t={}", self.ticker))?;
+        let body = get_html_body(&format!("https://finviz.com/quote.ashx?t={}", self.ticker)).await?;
         let document = Html::parse_document(&body);
 
         let mut fundament_info: DictData = BTreeMap::new();

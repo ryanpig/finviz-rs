@@ -1,7 +1,7 @@
 
 finviz-rs
 =====
-The Rust library `finviz-rs` is a crate for fetching financial data and stock charts from Finviz website. It aims to provide a lightweight and type-safe library for accessing a range of financial information. 
+The Rust library `finviz-rs` is a crate for fetching financial data and stock charts from Finviz website asynchronously. 
 
 [![Cargo Build & Test](https://github.com/ryanpig/finviz-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/ryanpig/finviz-rs/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/finviz-rs.svg)](https://crates.io/crates/finviz-rs)
@@ -57,7 +57,7 @@ cargo run --example tickers
 ```
 ```rust
     // output json to table
-    let fundament_info = Tickers::new("AAPL").scrape()?;
+    let fundament_info = Tickers::new("AAPL").scrape().await?;
     println!("{}", from_dict_to_table(&fundament_info, 4).to_table(None, None));
 ```
 
@@ -89,7 +89,7 @@ cargo run --example news
 
 ```rust
     let r = News::default()
-        .scrape()?;
+        .scrape().await?;
     println!("{}", r.news.to_table(Some(News::default_header()), Some(5)));
 ```
 
@@ -120,7 +120,7 @@ cargo run --example screener
     let table_str = Screener::new(ScreenerType::Performance)
         .set_signal(SignalType::TopLosers)
         .set_order(OrderType::EPS)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(2));
     println!("{}", table_str);
 
@@ -128,7 +128,7 @@ cargo run --example screener
     let table_str= Screener::new(ScreenerType::Financial)
         .set_signal(SignalType::NewHigh)
         .set_order(OrderType::MarketCap)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(3));
     println!("{}", table_str);
 
@@ -160,7 +160,7 @@ cargo run --example screener
 ```
 ```rust
     let table_str = Insider::default()
-        .scrape()?
+        .scrape().await?
         .to_table(Some(Insider::default_header()), Some(3));
     println!("{}", table_str);
 ```
@@ -183,7 +183,7 @@ cargo run --example forex
 ```
 ```rust
     let table_str = Forex::default()
-        .scrape()?
+        .scrape().await?
         .to_table(Some(Forex::default_header()), Some(3));
     println!("{}", table_str);
 
@@ -207,7 +207,7 @@ cargo run --example crypto
 ```
 ```rust
     let table_str = Crypto::default()
-        .scrape()?
+        .scrape().await?
         .to_table(Some(Crypto::default_header()), Some(3));
     println!("{}", table_str);
 
@@ -232,7 +232,7 @@ cargo run --example future
 ```
 ```rust
     let table_str = Future::default()
-        .scrape()?
+        .scrape().await?
         .to_table(Some(Future::default_header()), Some(3));
     println!("{}", table_str);
 ```
@@ -255,7 +255,7 @@ cargo run --example future
 ```
 ```rust
     let table_str = Group::new(GroupBy::Industry, GroupType::Valuation, OrderBy::PerformanceWeek, Ordering::Ascending)
-        .scrape()?
+        .scrape().await?
         .to_table(None, Some(5));
     println!("{}", table_str);
 
@@ -283,7 +283,7 @@ cargo run --example output_csv
 
 ```rust
     Screener::new(ScreenerType::Performance)
-        .scrape()?
+        .scrape().await?
         .to_csv_file("output.csv")?;
 ```
 
@@ -294,7 +294,7 @@ cargo run --example output_json
 
 ```rust
     let json_data = Forex::default()
-        .scrape()?
+        .scrape().await?
         .into_iter()
         .take(2)
         .collect::<TableData>()
@@ -319,7 +319,7 @@ cargo run --example iter_all_enum_variants
     // fetch all types of insider trading data by iterating the enum of InsiderType
     for insider_type in InsiderType::iter() {
         let table_str = Insider::new(insider_type)
-            .scrape()?
+            .scrape().await?
             .to_table(Some(Insider::default_header()), Some(3));
         println!("{}", table_str);
     }
