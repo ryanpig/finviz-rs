@@ -1,6 +1,7 @@
 use crate::screener_type::ScreenerType;
 use crate::signal_type::SignalType;
 use crate::order_type::OrderType;
+use crate::order_type::Ordering;
 use crate::web_scraper::scrape_common;
 use crate::common::{TableData, Scrape};
 use async_trait::async_trait;
@@ -42,7 +43,8 @@ const BASE_URL: &str = "https://finviz.com/screener.ashx?";
 pub struct Screener {
     base_type: ScreenerType,
     signal_type: Option<SignalType>,
-    order_type: Option<OrderType>
+    order_type: Option<OrderType>,
+    ordering: Ordering
 }
 
 impl Default for Screener {
@@ -55,7 +57,7 @@ impl Screener {
 
     /// Creates a new `Screener` instance with the specified `ScreenerType`.
     pub fn new(base_type: ScreenerType) ->  Self {
-        Self {base_type, signal_type: None, order_type: None}
+        Self {base_type, signal_type: None, order_type: None, ordering: Ordering::Ascending }
     }
 
     /// Sets the signal type for the screener.
@@ -64,18 +66,26 @@ impl Screener {
         self
     }
 
-    /// Sets the order type for the screener.
+    /// Sets the order type for the screener with ascending ordering.
     pub fn set_order(&mut self, order_type: OrderType) -> &mut Self {
         self.order_type = Some(order_type);
         self
     }
 
+    /// Sets the order type for the screener with descending ordering.
+    pub fn set_descending_order(&mut self, order_type: OrderType) -> &mut Self {
+        self.order_type = Some(order_type);
+        self.ordering = Ordering::Descending;
+        self
+    }
+
+
     /// Generates the URL based on the current screener configuration.
     pub fn to_url(&self) ->  String {
-        format!("{}v={}{}{}", BASE_URL, 
+        format!("{}v={}{}{}", BASE_URL,
                             self.base_type, 
                             self.signal_type.as_ref().map_or(String::new(), |s| format!("&s={}", s)),
-                            self.order_type.as_ref().map_or(String::new(), |s| format!("&{}", s))
+                            self.order_type.as_ref().map_or(String::new(), |s| format!("&o={}{}", self.ordering, s))
                )
 
     }
@@ -116,6 +126,14 @@ mod tests {
         screener.set_signal(SignalType::TopLosers);
         screener.set_order(OrderType::Company);
         assert_eq!(screener.to_url(), "https://finviz.com/screener.ashx?v=141&s=ta_toplosers&o=company");
+    }
+
+    #[test]
+    fn test_base_url_with_descending_order_type() {
+        let mut screener = Screener::new(ScreenerType::Performance);
+        screener.set_signal(SignalType::TopLosers);
+        screener.set_descending_order(OrderType::Ticker);
+        assert_eq!(screener.to_url(), "https://finviz.com/screener.ashx?v=141&s=ta_toplosers&o=-ticker");
     }
 
 }
