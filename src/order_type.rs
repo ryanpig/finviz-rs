@@ -4,7 +4,7 @@ use strum::EnumIter;
 /// Represents the possible order type that can be passed as parameter in `Screener`.
 #[doc(hidden)]
 #[allow(dead_code)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum OrderType {
     Ticker,
     Company,

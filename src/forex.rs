@@ -4,7 +4,7 @@ use strum::EnumIter;
 use async_trait::async_trait;
 
 /// Represents the type of Forex data.
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum ForexType {
     /// Forex performance represented as a percentage.
     Percent,

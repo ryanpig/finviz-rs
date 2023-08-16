@@ -5,7 +5,7 @@ use strum::EnumIter;
 use async_trait::async_trait;
 
 #[doc(hidden)]
-#[derive(EnumIter)]
+#[derive(Clone, EnumIter)]
 pub enum InsiderType {
     Latest,
     LatestBuys,

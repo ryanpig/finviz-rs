@@ -5,7 +5,7 @@ use strum::EnumIter;
 use async_trait::async_trait;
 
 #[doc(hidden)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum OrderBy {
     Name,
     MarketCapitalization,
@@ -74,7 +74,7 @@ impl fmt::Display for OrderBy {
 
 #[doc(hidden)]
 #[allow(dead_code)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum GroupType {
     Overview,
     Valuation,
@@ -98,7 +98,7 @@ impl fmt::Display for GroupType {
 
 #[doc(hidden)]
 #[allow(dead_code)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum GroupBy {
     Sector,
     Industry,
@@ -142,7 +142,7 @@ impl fmt::Display for GroupBy {
 
 #[doc(hidden)]
 #[allow(dead_code)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum Ordering {
     Ascending, 
     Descending,

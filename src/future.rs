@@ -34,7 +34,7 @@ impl std::error::Error for FutureError {
 
 /// Represents the time frame for futures data.
 #[doc(hidden)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum TimeFrame {
     Daily, Weekly, Monthly, Quarter, HalfYear, Year
 }

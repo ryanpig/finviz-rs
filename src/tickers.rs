@@ -39,7 +39,7 @@ pub struct Tickers {
 }
 
 #[doc(hidden)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum TimeFrameType {
     Daily, Weekly, Monthly
 }
@@ -58,7 +58,7 @@ impl fmt::Display for TimeFrameType {
 }
 
 #[doc(hidden)]
-#[derive(EnumIter)]
+#[derive(Clone, Copy, EnumIter)]
 pub enum ChartType {
     CANDLE, LINE, ADVANCED
 }
