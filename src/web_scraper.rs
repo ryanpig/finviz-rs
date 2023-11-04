@@ -44,15 +44,27 @@ pub async fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Bo
     let table_selector = Selector::parse("table.styled-table-new")?;
     let row_selector = Selector::parse("tr")?;
     let cell_selector = Selector::parse("td")?;
+    let header_selector = Selector::parse("th")?;
 
     let frame: Result<Vec<Vec<String>>, &str> = document
         .select(&table_selector).next()
         .ok_or("Failed to select the table")
         .map(|table| {
-            let n = if skip_header {1} else {0};
-            let rows = table.select(&row_selector).skip(n);
+
             let mut frame = Vec::new();
 
+            // add header row
+            if skip_header == false {
+                let headers = table.select(&header_selector).skip(1);
+                let mut row_header = Vec::new();
+                for header in headers {
+                    let text = header.text().collect::<String>().trim().to_owned();
+                    row_header.push(text);
+                }
+                frame.push(row_header);
+            }
+
+            let rows = table.select(&row_selector).skip(1);
             for row in rows {
                 let cells = row.select(&cell_selector).skip(1); // Skip the first cell
                 let mut info_dict = Vec::new();
