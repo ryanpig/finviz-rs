@@ -54,7 +54,7 @@ pub async fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Bo
             let mut frame = Vec::new();
 
             // add header row
-            if skip_header == false {
+            if !skip_header {
                 let headers = table.select(&header_selector).skip(1);
                 let mut row_header = Vec::new();
                 for header in headers {
