@@ -74,7 +74,7 @@ impl Scrape<NewsData> for News {
         let tables_selector = Selector::parse("table").map_err(|err| err.to_string())?;
         let mut tables = news_content.select(&tables_selector);
 
-        let news = tables.nth(2).ok_or("Cannot find News table".to_string())?;
+        let news = tables.next().ok_or("Cannot find News table".to_string())?;
         let blog = tables.next().ok_or("Cannot find Blog table".to_string())?;
 
         let news = parse_news_table(news)?;
