@@ -95,7 +95,7 @@ impl Scrape<TableData> for Insider {
         let body = get_html_body(&url).await?;
         let document = Html::parse_document(&body);
 
-        let table_selector = Selector::parse("table.body-table")?;
+        let table_selector = Selector::parse("table.styled-table-new")?;
         let row_selector = Selector::parse("tr")?;
         let header_selector = Selector::parse("td")?;
         let link_selector = Selector::parse("a")?;

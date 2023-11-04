@@ -41,7 +41,7 @@ pub async fn scrape_common(url: &str, skip_header: bool) -> Result<TableData, Bo
     let body = get_html_body(url).await?;
     let document = Html::parse_document(&body);
 
-    let table_selector = Selector::parse("table.table-light")?;
+    let table_selector = Selector::parse("table.styled-table-new")?;
     let row_selector = Selector::parse("tr")?;
     let cell_selector = Selector::parse("td")?;
 
